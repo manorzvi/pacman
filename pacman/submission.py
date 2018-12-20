@@ -25,12 +25,14 @@ class ReflexAgent(Agent):
     legalMoves = gameState.getLegalActions()
     #print(legalMoves)
     # Choose one of the best actions
+    move_score_pairs = {action : self.evaluationFunction(gameState, action) for action in legalMoves}
     scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
-    input('Press <ENTER> to continue')
-
+    #print('move-score pairs:', end=' ');print(move_score_pairs)
     bestScore = max(scores)
     bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
     chosenIndex = random.choice(bestIndices) # Pick randomly among the best
+    #print('Chosen Move:',end=' ');print(legalMoves[chosenIndex])
+    #input('Press <ENTER> to continue')
 
 
     return legalMoves[chosenIndex]
@@ -80,7 +82,11 @@ def betterEvaluationFunction(gameState):
 
   minDistFood = getMinDistFood(gameState)
   #print(getMinDistFood(gameState))
-  score = gameState.getScore() + 1/minDistFood
+
+
+  #score = gameState.getScore() + 1/minDistFood
+  score = gameState.getScore() - minDistFood # the smaller minDistFood, the better
+  score -= gameState.getNumFood()
 
   goodGhosts = list()
   badGhosts = list()
@@ -92,35 +98,47 @@ def betterEvaluationFunction(gameState):
 
   pos = gameState.getPacmanPosition()
 
-  minDistBadGhost = getMinDistGhost(pos,badGhosts)
-  score += minDistBadGhost # we like bad ghosts as far as possible
+  #minDistBadGhost = getMinDistGhost(pos,badGhosts)
+  #score += 2*minDistBadGhost # we like bad ghosts as far as possible
 
-  minDistGoodGhost = getMinDistGhost(pos,goodGhosts)
-  if minDistGoodGhost:
-      score += 1/minDistGoodGhost # the closer good ghost is the better
+  #minDistGoodGhost = getMinDistGhost(pos,goodGhosts)
+  #score -= 2*minDistGoodGhost # the closer good ghost is the better
 
-  minDistCapsule = getMinDistCapsule(pos,gameState)
-  if minDistCapsule:
-      score += 1/minDistCapsule # the closer capsule is the better
+  numCapsule = getNumCaspsules(gameState)
+  #print(numCapsule)
+  score -= numCapsule # if capsules number in next state lower then current, it means that we have ate a capsule.
+                            # which is good.
+
+  if isCapsule(pos,gameState):
+      return np.inf
+
+  #if isBadGhost(pos,badGhosts):
+  #    return -np.inf
+
+  score -= 10*len(badGhosts)
 
   return score
 
+def isBadGhost(pos,badGhosts):
+    for g in badGhosts:
+        if g.getPosition() == pos:
+            return True
+        else:
+            return False
 
 
-def getMinDistCapsule(pos,gameState):
 
-    capsulesPositions = gameState.getCapsules()
-    #print(capsulesPositions)
-    #print(len(capsulesPositions))
-    if len(capsulesPositions):
-        minDist = min(map(lambda x: util.manhattanDistance(pos, x), capsulesPositions))
-        print('current pos:',end=' ');print(pos)
-        print('capsules pos:', end=' ');print(capsulesPositions)
-        print('minD:', end=' ');print(minDist);print('****')
-        return minDist
-    else:
-        return 0
+def isCapsule(pos,gameState):
+    capsulesPos = gameState.getCapsules()
+    for c in capsulesPos:
+        if pos == c:
+            return True
+        else:
+            return False
 
+
+def getNumCaspsules(gameState):
+    return len(gameState.getCapsules())
 
 def getMinDistGhost(pos,Ghosts):
 
@@ -129,6 +147,7 @@ def getMinDistGhost(pos,Ghosts):
         return min(map(lambda x: util.manhattanDistance(pos, x), ghostsPositions))
     else:
         return 0
+
 
 def getMinDistFood(gameState):
     """
