@@ -2,6 +2,8 @@ import random
 import util
 from game import Agent
 import numpy as np
+import math
+
 
 #     ********* Reflex agent- sections a and b *********
 class ReflexAgent(Agent):
@@ -12,7 +14,6 @@ class ReflexAgent(Agent):
   def __init__(self):
     self.lastPositions = []
     self.dc = None
-
 
   def getAction(self, gameState):
     """
@@ -33,8 +34,6 @@ class ReflexAgent(Agent):
     chosenIndex = random.choice(bestIndices) # Pick randomly among the best
     #print('Chosen Move:',end=' ');print(legalMoves[chosenIndex])
     #input('Press <ENTER> to continue')
-
-
     return legalMoves[chosenIndex]
 
   def evaluationFunction(self, currentGameState, action):
@@ -50,7 +49,7 @@ class ReflexAgent(Agent):
 #     ********* Evaluation functions *********
 
 def scoreEvaluationFunction(gameState):
-  """
+  """"
     This default evaluation function just returns the score of the state.
     The score is the same one displayed in the Pacman GUI.
   """
@@ -163,10 +162,8 @@ def getMinDistFood(gameState):
     minDistFood = min(map(lambda x: util.manhattanDistance(pos, x), foodList))
     return minDistFood
 
-
-
-
 #     ********* MultiAgent Search Agents- sections c,d,e,f*********
+
 
 class MultiAgentSearchAgent(Agent):
   """
@@ -190,6 +187,7 @@ class MultiAgentSearchAgent(Agent):
 
 ######################################################################################
 # c: implementing minimax
+
 
 class MinimaxAgent(MultiAgentSearchAgent):
   """
@@ -228,15 +226,44 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
       self.depth:
         The depth to which search should continue
-
     """
+    minimax = -math.inf
+    minimax_action = []
+    turn = self.index
+    for action in gameState.getLegalActions(turn):
+        curr_minimax = self.minimax(gameState.generateSuccessor(turn, action))
+        if curr_minimax > minimax:
+            minimax = curr_minimax
+            minimax_action = action
+    return minimax_action
 
-    # BEGIN_YOUR_CODE
-    raise Exception("Not implemented yet")
-    # END_YOUR_CODE
+
+  def minimax(self, gameState):
+    if gameState.isWin() or gameState.isLose() or self.depth == 0:
+        return self.evaluationFunction(gameState)
+    children = list()
+    turn = self.index
+    for action in gameState.getLegalActions(turn):
+        children.append(gameState.generateSuccessor(turn, action))
+
+    if turn == 0:
+        cur_max = -math.inf
+        self.depth = self.depth - 1
+        for c in children:
+            v = self.minimax(c)
+            cur_max = max(cur_max, v)
+        return cur_max
+
+    else:
+        cur_min = math.inf
+        for c in children:
+            v = self.minimax(c)
+            cur_min = min(cur_min, v)
+        return cur_min
 
 ######################################################################################
 # d: implementing alpha-beta
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
   """
