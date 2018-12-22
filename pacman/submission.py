@@ -349,17 +349,13 @@ class RandomExpectimaxAgent(MultiAgentSearchAgent):
         return [cur_max_v, cur_action]
 
     else:
-        cur_min_v = math.inf
-        cur_action = []
+        action = []
         p = 1/len(gameState.getLegalActions(agent))
         v = 0
         for action in gameState.getLegalActions(agent):
             c = gameState.generateSuccessor(agent, action)
             v += p * self.random_expectimax(c, agent + 1, depth)[0]
-            if v <= cur_min_v:
-                cur_min_v = v
-                cur_action = action
-        return [cur_min_v, cur_action]
+        return [v, action]
 
 ######################################################################################
 # f: implementing directional expectimax
