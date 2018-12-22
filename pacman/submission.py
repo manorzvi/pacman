@@ -274,14 +274,47 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     """
       Returns the minimax action using self.depth and self.evaluationFunction
     """
+    minimax = -math.inf
+    minimax_action = []
+    turn = self.index
+    for action in gameState.getLegalActions(turn):
+        curr_minimax = self.alpha_beta(gameState.generateSuccessor(turn, action), -math.inf, math.inf)
+        if curr_minimax > minimax:
+            minimax = curr_minimax
+            minimax_action = action
+    return minimax_action
 
-    # BEGIN_YOUR_CODE
-    raise Exception("Not implemented yet")
-    # END_YOUR_CODE
+  def alpha_beta(self, gameState, alpha, beta):
+    if gameState.isWin() or gameState.isLose() or self.depth == 0:
+        return self.evaluationFunction(gameState)
+    children = list()
+    turn = self.index
+    for action in gameState.getLegalActions(turn):
+        children.append(gameState.generateSuccessor(turn, action))
+
+    if turn == 0:
+        cur_max = -math.inf
+        self.depth = self.depth - 1
+        for c in children:
+            v = self.alpha_beta(c, alpha, beta)
+            cur_max = max(cur_max, v)
+            alpha = max(cur_max, alpha)
+            if cur_max >= beta:
+                return math.inf
+        return cur_max
+
+    else:
+        cur_min = math.inf
+        for c in children:
+            v = self.alpha_beta(c, alpha, beta)
+            cur_min = min(cur_min, v)
+            beta = min(cur_min, beta)
+            if cur_min <= alpha:
+                return -math.inf
+        return cur_min
 
 ######################################################################################
 # e: implementing random expectimax
-
 
 class RandomExpectimaxAgent(MultiAgentSearchAgent):
   """
