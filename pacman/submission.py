@@ -351,7 +351,7 @@ class RandomExpectimaxAgent(MultiAgentSearchAgent):
 
     else:
         action = []
-        p = 1/len(gameState.getLegalActions(agent))
+        p = 1.0/float(len(gameState.getLegalActions(agent)))
         v = 0
         for action in gameState.getLegalActions(agent):
             c = gameState.generateSuccessor(agent, action)
