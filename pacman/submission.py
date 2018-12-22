@@ -5,6 +5,7 @@ import numpy as np
 import math
 
 
+
 #     ********* Reflex agent- sections a and b *********
 class ReflexAgent(Agent):
   """
@@ -227,40 +228,38 @@ class MinimaxAgent(MultiAgentSearchAgent):
       self.depth:
         The depth to which search should continue
     """
-    minimax = -math.inf
-    minimax_action = []
-    agent = self.index
-    for action in gameState.getLegalActions(agent):
-        curr_minimax = self.minimax(gameState.generateSuccessor(agent, action), agent, self.depth)
-        if curr_minimax >= minimax:
-            minimax = curr_minimax
-            minimax_action = action
-    return minimax_action
+
+    minimax = self.minimax(gameState, self.index, self.depth)
+    return minimax[1]
 
   def minimax(self, gameState, agent, depth):
     if agent >= gameState.getNumAgents():
         agent = 0
         depth -= 1
     if gameState.isWin() or gameState.isLose() or depth == 0:
-        return self.evaluationFunction(gameState)
-
-    children = list()
-    for action in gameState.getLegalActions(agent):
-        children.append(gameState.generateSuccessor(agent, action))
+        return [self.evaluationFunction(gameState), []]
 
     if agent == 0:
-        cur_max = -math.inf
-        for c in children:
-            v = self.minimax(c, agent+1, depth)
-            cur_max = max(cur_max, v)
-        return cur_max
+        cur_max_v = -math.inf
+        cur_action = []
+        for action in gameState.getLegalActions(agent):
+            c = gameState.generateSuccessor(agent, action)
+            v = self.minimax(c, agent+1, depth)[0]
+            if v >= cur_max_v:
+                cur_max_v = v
+                cur_action = action
+        return [cur_max_v, cur_action]
 
     else:
-        cur_min = math.inf
-        for c in children:
-            v = self.minimax(c, agent+1, depth)
-            cur_min = min(cur_min, v)
-        return cur_min
+        cur_min_v = math.inf
+        cur_action = []
+        for action in gameState.getLegalActions(agent):
+            c = gameState.generateSuccessor(agent, action)
+            v = self.minimax(c, agent+1, depth)[0]
+            if v <= cur_min_v:
+                cur_min_v = v
+                cur_action = action
+        return [cur_min_v, cur_action]
 
 ######################################################################################
 # d: implementing alpha-beta
@@ -275,47 +274,43 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     """
       Returns the minimax action using self.depth and self.evaluationFunction
     """
-    minimax = -math.inf
-    minimax_action = []
-    turn = self.index
-    for action in gameState.getLegalActions(turn):
-        curr_minimax = self.alpha_beta(gameState.generateSuccessor(turn, action), turn, self.depth, -math.inf, math.inf)
-        if curr_minimax > minimax:
-            minimax = curr_minimax
-            minimax_action = action
-    return minimax_action
+    alpha_beta = self.alpha_beta(gameState, self.index, self.depth, -math.inf, math.inf)
+    return alpha_beta[1]
 
   def alpha_beta(self, gameState, agent, depth, alpha, beta):
     if agent >= gameState.getNumAgents():
         agent = 0
         depth -= 1
     if gameState.isWin() or gameState.isLose() or depth == 0:
-        return self.evaluationFunction(gameState)
+        return [self.evaluationFunction(gameState), []]
 
-    children = list()
-    turn = self.index
-    for action in gameState.getLegalActions(turn):
-        children.append(gameState.generateSuccessor(turn, action))
-
-    if turn == 0:
-        cur_max = -math.inf
-        for c in children:
-            v = self.alpha_beta(c, agent+1, depth, alpha, beta)
-            cur_max = max(cur_max, v)
-            alpha = max(cur_max, alpha)
-            if cur_max >= beta:
-                return math.inf
-        return cur_max
+    if agent == 0:
+        cur_max_v = -math.inf
+        cur_action = []
+        for action in gameState.getLegalActions(agent):
+            c = gameState.generateSuccessor(agent, action)
+            v = self.alpha_beta(c, agent+1, depth, alpha, beta)[0]
+            if v >= cur_max_v:
+                cur_max_v = v
+                cur_action = action
+            alpha = max(cur_max_v, alpha)
+            if cur_max_v >= beta:
+                return [math.inf, cur_action]
+        return [cur_max_v, cur_action]
 
     else:
-        cur_min = math.inf
-        for c in children:
-            v = self.alpha_beta(c, agent+1, depth, alpha, beta)
-            cur_min = min(cur_min, v)
-            beta = min(cur_min, beta)
-            if cur_min <= alpha:
-                return -math.inf
-        return cur_min
+        cur_min_v = math.inf
+        cur_action = []
+        for action in gameState.getLegalActions(agent):
+            c = gameState.generateSuccessor(agent, action)
+            v = self.alpha_beta(c, agent+1, depth, alpha, beta)[0]
+            if v <= cur_min_v:
+                cur_min_v = v
+                cur_action = action
+            beta = min(cur_min_v, beta)
+            if cur_min_v <= alpha:
+                return [-math.inf, cur_action]
+        return [cur_min_v, cur_action]
 
 ######################################################################################
 # e: implementing random expectimax
