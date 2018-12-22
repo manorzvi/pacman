@@ -1,6 +1,7 @@
 import random
 import util
 from game import Agent
+from game import Actions
 import numpy as np
 import math
 
@@ -34,7 +35,7 @@ class ReflexAgent(Agent):
     bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
     chosenIndex = random.choice(bestIndices) # Pick randomly among the best
     #print('Chosen Move:',end=' ');print(legalMoves[chosenIndex])
-    #input('Press <ENTER> to continue')
+    #input('Press <ENTER> to continue\n\n')
     return legalMoves[chosenIndex]
 
   def evaluationFunction(self, currentGameState, action):
@@ -371,9 +372,74 @@ class DirectionalExpectimaxAgent(MultiAgentSearchAgent):
       All ghosts should be modeled as using the DirectionalGhost distribution to choose from their legal moves.
     """
 
-    # BEGIN_YOUR_CODE
-    raise Exception("Not implemented yet")
-    # END_YOUR_CODE
+    dir_random_expectimax = self.directional_random_expectimax(gameState, self.index, self.depth)
+    return dir_random_expectimax[1]
+
+  def directional_random_expectimax(self, gameState, agent, depth):
+
+      if agent >= gameState.getNumAgents():
+          agent = 0
+          depth -= 1
+      if gameState.isWin() or gameState.isLose() or depth == 0:
+          return [self.evaluationFunction(gameState), []]
+
+      if agent == 0:
+          cur_max_v = -math.inf
+          cur_action = []
+          for action in gameState.getLegalActions(agent):
+              c = gameState.generateSuccessor(agent, action)
+              v = self.directional_random_expectimax(c, agent + 1, depth)[0]
+              if v >= cur_max_v:
+                  cur_max_v = v
+                  cur_action = action
+          return [cur_max_v, cur_action]
+
+
+      else:
+          action = []
+          dist = getDistribution(gameState, agent)
+          v = 0
+          for action,prob in dist.items():
+              c = gameState.generateSuccessor(agent, action)
+              v += prob * self.directional_random_expectimax(c, agent + 1, depth)[0]
+          return [v, action]
+
+
+
+def getDistribution(gameState, agent):
+    ghostState = gameState.getGhostState(agent)
+    legalActions = gameState.getLegalActions(agent)
+    pos = gameState.getGhostPosition(agent)
+    isScared = ghostState.scaredTimer > 0
+
+    speed = 1
+    if isScared: speed = 0.5
+
+    actionVectors = [Actions.directionToVector(a, speed) for a in legalActions]
+    newPositions = [(pos[0] + a[0], pos[1] + a[1]) for a in actionVectors]
+    pacmanPosition = gameState.getPacmanPosition()
+
+    # Select best actions given the state
+    distancesToPacman = [util.manhattanDistance(pos, pacmanPosition) for pos in newPositions]
+    if isScared:
+        bestScore = max(distancesToPacman)
+        bestProb = 0.8
+    else:
+        bestScore = min(distancesToPacman)
+        bestProb = 0.8
+
+    bestActions = [action for action, distance in zip(legalActions, distancesToPacman) if distance == bestScore]
+    # print('best actions:',end=' ');print(bestActions)
+
+    # Construct distribution
+    dist = util.Counter()
+    for a in bestActions: dist[a] = bestProb / len(bestActions)
+    # print('1) dist:',end=' ');print(dist)
+    for a in legalActions: dist[a] += (1 - bestProb) / len(legalActions)
+    # print('2) dist:',end=' ');print(dist)
+    dist.normalize()
+    #print('3) dist:',end=' ');print(dist)
+    return dist
 
 
 ######################################################################################
