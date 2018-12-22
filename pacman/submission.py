@@ -315,6 +315,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 ######################################################################################
 # e: implementing random expectimax
 
+
 class RandomExpectimaxAgent(MultiAgentSearchAgent):
   """
     Your expectimax agent
@@ -326,9 +327,39 @@ class RandomExpectimaxAgent(MultiAgentSearchAgent):
       All ghosts should be modeled as choosing uniformly at random from their legal moves.
     """
 
-    # BEGIN_YOUR_CODE
-    raise Exception("Not implemented yet")
-    # END_YOUR_CODE
+    random_expectimax = self.random_expectimax(gameState, self.index, self.depth)
+    return random_expectimax[1]
+
+  def random_expectimax(self, gameState, agent, depth):
+    if agent >= gameState.getNumAgents():
+        agent = 0
+        depth -= 1
+    if gameState.isWin() or gameState.isLose() or depth == 0:
+        return [self.evaluationFunction(gameState), []]
+
+    if agent == 0:
+        cur_max_v = -math.inf
+        cur_action = []
+        for action in gameState.getLegalActions(agent):
+            c = gameState.generateSuccessor(agent, action)
+            v = self.random_expectimax(c, agent + 1, depth)[0]
+            if v >= cur_max_v:
+                cur_max_v = v
+                cur_action = action
+        return [cur_max_v, cur_action]
+
+    else:
+        cur_min_v = math.inf
+        cur_action = []
+        p = 1/len(gameState.getLegalActions(agent))
+        v = 0
+        for action in gameState.getLegalActions(agent):
+            c = gameState.generateSuccessor(agent, action)
+            v += p * self.random_expectimax(c, agent + 1, depth)[0]
+            if v <= cur_min_v:
+                cur_min_v = v
+                cur_action = action
+        return [cur_min_v, cur_action]
 
 ######################################################################################
 # f: implementing directional expectimax
