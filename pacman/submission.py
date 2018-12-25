@@ -2,8 +2,9 @@ import random
 import util
 from game import Agent
 from game import Actions
-import numpy as np
 import math
+from timeit import default_timer as timer
+from random import shuffle
 
 
 
@@ -24,18 +25,25 @@ class ReflexAgent(Agent):
     getAction takes a GameState and returns some Directions.X for some X in the set {North, South, West, East, Stop}
     ------------------------------------------------------------------------------
     """
+    start = timer()
     # Collect legal moves and successor states
     legalMoves = gameState.getLegalActions()
+    shuffle(legalMoves)
     #print(legalMoves)
+
     # Choose one of the best actions
     move_score_pairs = {action : self.evaluationFunction(gameState, action) for action in legalMoves}
     scores = [self.evaluationFunction(gameState, action) for action in legalMoves]
     #print('move-score pairs:', end=' ');print(move_score_pairs)
+
     bestScore = max(scores)
     bestIndices = [index for index in range(len(scores)) if scores[index] == bestScore]
     chosenIndex = random.choice(bestIndices) # Pick randomly among the best
     #print('Chosen Move:',end=' ');print(legalMoves[chosenIndex])
+
     #input('Press <ENTER> to continue\n\n')
+    end = timer()
+    print("Step Time: {}".format(end-start))
     return legalMoves[chosenIndex]
 
   def evaluationFunction(self, currentGameState, action):
@@ -75,19 +83,19 @@ def betterEvaluationFunction(gameState):
   gameState.getScore():
   The GameState class is defined in pacman.py and you might want to look into that for other helper methods.
   """
-  if gameState.isLose():
-      return float(-np.inf)
-  elif gameState.isWin():
-      return float(np.inf)
 
+  if gameState.isWin():
+      return 10000
+  elif gameState.isLose():
+      return -10000
 
-  minDistFood = getMinDistFood(gameState)
+  pos = gameState.getPacmanPosition()
+
+  minDistFood = getMinDistFood(gameState, pos)
   #print(getMinDistFood(gameState))
 
-
-  #score = gameState.getScore() + 1/minDistFood
-  score = gameState.getScore() - minDistFood # the smaller minDistFood, the better
-  score -= gameState.getNumFood()
+  # the smaller minDistFood, the better
+  score = gameState.getScore() + 1/minDistFood
 
   goodGhosts = list()
   badGhosts = list()
@@ -97,49 +105,23 @@ def betterEvaluationFunction(gameState):
       else:
           badGhosts.append(ghost)
 
-  pos = gameState.getPacmanPosition()
 
-  #minDistBadGhost = getMinDistGhost(pos,badGhosts)
-  #score += 2*minDistBadGhost # we like bad ghosts as far as possible
+  minDistBadGhost = getMinDistGhost(pos,badGhosts)
+  if minDistBadGhost > 0:
+      score -= 1/minDistBadGhost # we like bad ghosts as far as possible
 
-  #minDistGoodGhost = getMinDistGhost(pos,goodGhosts)
-  #score -= 2*minDistGoodGhost # the closer good ghost is the better
+  minDistGoodGhost = getMinDistGhost(pos,goodGhosts)
+  if minDistGoodGhost > 0:
+      score += 1/minDistGoodGhost # the closer good ghost is the better
 
-  numCapsule = getNumCaspsules(gameState)
-  #print(numCapsule)
-  score -= numCapsule # if capsules number in next state lower then current, it means that we have ate a capsule.
-                            # which is good.
-
-  if isCapsule(pos,gameState):
-      return np.inf
-
-  #if isBadGhost(pos,badGhosts):
-  #    return -np.inf
-
-  score -= 10*len(badGhosts)
+  #numCapsule = len(gameState.getCapsules())
+  # if capsules number in next state lower then current, it means that we ate a capsule.
+  # which is good.
+  #if numCapsule > 0:
+  #    score += 1/numCapsule
 
   return score
 
-def isBadGhost(pos,badGhosts):
-    for g in badGhosts:
-        if g.getPosition() == pos:
-            return True
-        else:
-            return False
-
-
-
-def isCapsule(pos,gameState):
-    capsulesPos = gameState.getCapsules()
-    for c in capsulesPos:
-        if pos == c:
-            return True
-        else:
-            return False
-
-
-def getNumCaspsules(gameState):
-    return len(gameState.getCapsules())
 
 def getMinDistGhost(pos,Ghosts):
 
@@ -150,16 +132,13 @@ def getMinDistGhost(pos,Ghosts):
         return 0
 
 
-def getMinDistFood(gameState):
+def getMinDistFood(gameState, pos):
     """
     gameState: GameState object of current state inspected
     return   : the minimal distance to food from current pacman location
     """
-
     foodGrid = gameState.getFood()
     foodList = foodGrid.asList()
-
-    pos = gameState.getPacmanPosition()
 
     minDistFood = min(map(lambda x: util.manhattanDistance(pos, x), foodList))
     return minDistFood
@@ -187,8 +166,9 @@ class MultiAgentSearchAgent(Agent):
     self.evaluationFunction = util.lookup(evalFn, globals())
     self.depth = int(depth)
 
+
 ######################################################################################
-# c: implementing minimax
+# c: implementing Minimax
 
 
 class MinimaxAgent(MultiAgentSearchAgent):
@@ -229,8 +209,11 @@ class MinimaxAgent(MultiAgentSearchAgent):
       self.depth:
         The depth to which search should continue
     """
+    start = timer()
 
     minimax = self.minimax(gameState, self.index, self.depth)
+    end = timer()
+    print("Step Time: {}".format(end-start))
     return minimax[1]
 
   def minimax(self, gameState, agent, depth):
@@ -275,7 +258,10 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
     """
       Returns the minimax action using self.depth and self.evaluationFunction
     """
+    start = timer()
     alpha_beta = self.alpha_beta(gameState, self.index, self.depth, -math.inf, math.inf)
+    end = timer()
+    print("Step Time: {}".format(end-start))
     return alpha_beta[1]
 
   def alpha_beta(self, gameState, agent, depth, alpha, beta):
@@ -327,8 +313,10 @@ class RandomExpectimaxAgent(MultiAgentSearchAgent):
       Returns the expectimax action using self.depth and self.evaluationFunction
       All ghosts should be modeled as choosing uniformly at random from their legal moves.
     """
-
+    start = timer()
     random_expectimax = self.random_expectimax(gameState, self.index, self.depth)
+    end = timer()
+    print("Step Time: {}".format(end-start))
     return random_expectimax[1]
 
   def random_expectimax(self, gameState, agent, depth):
