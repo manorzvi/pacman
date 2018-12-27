@@ -1,0 +1,12 @@
+OriginalReflexAgent,1,contestClassic,38.29,96.06E-06
+ReflexAgent,1,contestClassic,418.43,223.03E-06
+MinimaxAgent,2,contestClassic,1490.14,2667.64E-06
+MinimaxAgent,3,contestClassic,1395.14,13716.63E-06
+MinimaxAgent,4,contestClassic,1723.29,67186.85E-06
+AlphaBetaAgent,2,contestClassic,1543.57,1809.62E-06
+AlphaBetaAgent,3,contestClassic,1318.71,5245.77E-06
+AlphaBetaAgent,4,contestClassic,1631.71,18814.26E-06
+RandomExpectimaxAgent,2,contestClassic,1362.29,2837.27E-06
+RandomExpectimaxAgent,3,contestClassic,1460.29,12860.63E-06
+RandomExpectimaxAgent,4,contestClassic,1550.86,64408.78E-06
+
