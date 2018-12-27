@@ -6,9 +6,12 @@ from textDisplay import *
 
 players = [OriginalReflexAgent, ReflexAgent, MinimaxAgent, AlphaBetaAgent, RandomExpectimaxAgent]
 depths = [2, 3, 4]
-layouts = ['capsuleClassic', 'contestClassic', 'mediumClassic',
-           'minimaxClassic', 'openClassic', 'originalClassic',
-           'smallClassic', 'testClassic', 'trappedClassic', 'trickyClassic']
+#layouts = ['capsuleClassic', 'contestClassic', 'mediumClassic',
+#           'minimaxClassic', 'openClassic', 'originalClassic',
+#           'smallClassic', 'testClassic', 'trappedClassic', 'trickyClassic']
+#layouts = ['testClassic', 'trappedClassic', 'trickyClassic']
+layouts = ['trickyClassic']
+
 ghosts = [RandomGhost(1), RandomGhost(2)]
 
 

@@ -497,7 +497,8 @@ class Game:
     self.moveHistory = []
     self.totalAgentTimes = [0 for agent in agents]
     self.totalAgentTimeWarnings = [0 for agent in agents]
-    self.agentTimeout = False
+    #self.agentTimeout = False
+    self.agentTimeout = True #Manor - 27/12/18
     self.my_avg_time = 0
 
   def getProgress(self):
