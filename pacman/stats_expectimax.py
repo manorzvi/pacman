@@ -4,36 +4,19 @@ from pprint import pprint
 import matplotlib.pyplot as plt
 
 def mergeCsv():
-    results = '..\\results\\'
-    layoutRes = []
 
-    for filename in os.listdir(results):
+    results = '..\\expectimaxCompreResults\\'
 
-        layoutRes.append(results + filename)
-
-    with open('Dump.csv', 'w') as DumpFile:
-        for f in layoutRes:
-
-            with open(f, 'r') as layoutFile:
-                for line in layoutFile:
-
-                    DumpFile.write(line)
-
-    try:
-        os.remove('experiments.csv')
-    except OSError:
-        pass
-
-    with open('experiments.csv', 'w') as endFile, open('Dump.csv', 'r') as DumpFile:
+    with open('expectimax_compare_results.csv', 'w') as endFile, open('expectimax_results_trickyClassic.csv', 'r') as DumpFile:
         for line in DumpFile:
             if not line.strip(): continue  # skip the empty line
             endFile.write(line)  # non-empty line. Write it to output
 
-    os.remove('Dump.csv')
+    os.remove('expectimax_results_trickyClassic.csv')
 
 def plot_score_depth(take_time=False):
 
-    experiments_pd = pd.read_csv('experiments.csv', header=None)
+    experiments_pd = pd.read_csv('expectimax_compare_results.csv', header=None)
 
     agents = experiments_pd[0].unique()
 

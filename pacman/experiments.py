@@ -6,11 +6,11 @@ from textDisplay import *
 
 players = [OriginalReflexAgent, ReflexAgent, MinimaxAgent, AlphaBetaAgent, RandomExpectimaxAgent]
 depths = [2, 3, 4]
-layouts = ['capsuleClassic', 'contestClassic', 'mediumClassic',
-          'minimaxClassic', 'openClassic', 'originalClassic',
-           'smallClassic', 'testClassic', 'trappedClassic', 'trickyClassic']
+#layouts = ['capsuleClassic', 'contestClassic', 'mediumClassic',
+#           'minimaxClassic', 'openClassic', 'originalClassic',
+#           'smallClassic', 'testClassic', 'trappedClassic', 'trickyClassic']
 #layouts = ['testClassic', 'trappedClassic', 'trickyClassic']
-#layouts = ['trickyClassic']
+layouts = ['trickyClassic']
 
 ghosts = [RandomGhost(1), RandomGhost(2)]
 
@@ -42,12 +42,12 @@ if __name__ == '__main__':
             for player in players:
                 if player in [OriginalReflexAgent, ReflexAgent]:
                     i += 1
-                    print('[Experiment ' + str(i) + '] - python pacman.py -l ' + str(layout) + ' -p ' + str(player) + ' -n 7 -q -f')
+                    print('[Experiment ' + str(i) + '] - python pacman.py -l ' + str(layout) + ' -p ' + str(player) + ' -n 7 -q')
                     run_game(player(), layout, file_ptr)
                 else:
                     for d in depths:
                         i += 1
-                        print('[Experiment ' + str(i) + '] - python pacman.py -l ' + str(layout) + ' -p ' + str(player) + '-a depth=' + str(d) + ' -n 7 -q -f')
+                        print('[Experiment ' + str(i) + '] - python pacman.py -l ' + str(layout) + ' -p ' + str(player) + '-a depth=' + str(d) + ' -n 7 -q')
                         run_game(player(), layout, file_ptr, d)
 
             file_ptr.write('\n')

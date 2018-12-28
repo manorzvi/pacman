@@ -1,0 +1,5 @@
+RandomExpectimaxAgent,4,trickyClassic,1858,7.48E-01,,RandomGhost
+RandomExpectimaxAgent,4,trickyClassic,1678.8,6.01E-01,,DirectionalGhost
+,,,,,,
+DirectionalExpectimaxAgent,4,trickyClassic,1316.8,5.35E-01,,RandomGhost
+DirectionalExpectimaxAgent,4,trickyClassic,1315.8,1.13E+00,,DirectionalGhost
