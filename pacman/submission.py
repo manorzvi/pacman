@@ -114,35 +114,34 @@ def betterEvaluationFunction(gameState):
       return -10000
 
   pos = gameState.getPacmanPosition()
-
   minDistFood = getMinDistFood(gameState, pos)
   #print(getMinDistFood(gameState))
 
   # the smaller minDistFood, the better
   score = gameState.getScore() + 1/minDistFood
 
-  #goodGhosts = list()
-  #badGhosts = list()
-  #for ghost in gameState.getGhostStates():
-  #    if ghost.scaredTimer:
-  #        goodGhosts.append(ghost)
-  #    else:
-  #        badGhosts.append(ghost)
+  goodGhosts = list()
+  badGhosts = list()
+  for ghost in gameState.getGhostStates():
+      if ghost.scaredTimer:
+          goodGhosts.append(ghost)
+      else:
+          badGhosts.append(ghost)
 
 
-  #minDistBadGhost = getMinDistGhost(pos,badGhosts)
-  #if minDistBadGhost > 0:
-  #    score -= 1/minDistBadGhost # we like bad ghosts as far as possible
+  minDistBadGhost = getMinDistGhost(pos,badGhosts)
+  if minDistBadGhost > 0:
+       score -= 1/minDistBadGhost # we like bad ghosts as far as possible
 
-  #minDistGoodGhost = getMinDistGhost(pos,goodGhosts)
-  #if minDistGoodGhost > 0:
-  #    score += 1/minDistGoodGhost # the closer good ghost is the better
+  minDistGoodGhost = getMinDistGhost(pos,goodGhosts)
+  if minDistGoodGhost > 0:
+      score += 1/minDistGoodGhost # the closer good ghost is the better
 
-  #numCapsule = len(gameState.getCapsules())
+  numCapsule = len(gameState.getCapsules())
   # if capsules number in next state lower then current, it means that we ate a capsule.
   # which is good.
-  #if numCapsule > 0:
-  #    score += 1/numCapsule
+  if numCapsule > 0:
+      score += 1/numCapsule
 
   return score
 
@@ -441,16 +440,43 @@ class CompetitionAgent(MultiAgentSearchAgent):
   """
     Your competition agent
   """
-
   def getAction(self, gameState):
-    """
-      Returns the action using self.depth and self.evaluationFunction
+    competition = self.competition(gameState, self.index, 3, -math.inf, math.inf)
+    return competition[1]
 
-    """
+  def competition(self, gameState, agent, depth, alpha, beta):
+    if agent >= gameState.getNumAgents():
+        agent = 0
+        depth -= 1
+    if gameState.isWin() or gameState.isLose() or depth == 0:
+        return [self.evaluationFunction(gameState), []]
 
-    # BEGIN_YOUR_CODE
-    raise Exception("Not implemented yet")
-    # END_YOUR_CODE
+    if agent == 0:
+        cur_max_v = -math.inf
+        cur_action = []
+        for action in gameState.getLegalActions(agent):
+            c = gameState.generateSuccessor(agent, action)
+            v = self.competition(c, agent+1, depth, alpha, beta)[0]
+            if v >= cur_max_v:
+                cur_max_v = v
+                cur_action = action
+            alpha = max(cur_max_v, alpha)
+            if cur_max_v >= beta:
+                return [math.inf, cur_action]
+        return [cur_max_v, cur_action]
 
+    else:
+        cur_min_v = math.inf
+        cur_action = []
+        for action in gameState.getLegalActions(agent):
+            c = gameState.generateSuccessor(agent, action)
+            v = self.competition(c, agent+1, depth, alpha, beta)[0]
+            if v <= cur_min_v:
+                cur_min_v = v
+                cur_action = action
+            beta = min(cur_min_v, beta)
+            if cur_min_v <= alpha:
+                return [-math.inf, cur_action]
+        return [cur_min_v, cur_action]
 
 
