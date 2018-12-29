@@ -1,0 +1,12 @@
+OriginalReflexAgent,1,capsuleClassic,-262.86,144.21E-06
+ReflexAgent,1,capsuleClassic,-82.71,231.04E-06
+MinimaxAgent,2,capsuleClassic,-404.29,2407.62E-06
+MinimaxAgent,3,capsuleClassic,-207.71,8548.03E-06
+MinimaxAgent,4,capsuleClassic,-231.43,37165.68E-06
+AlphaBetaAgent,2,capsuleClassic,167.29,1882.74E-06
+AlphaBetaAgent,3,capsuleClassic,347.86,5673.84E-06
+AlphaBetaAgent,4,capsuleClassic,-12.14,16085.20E-06
+RandomExpectimaxAgent,2,capsuleClassic,-352.43,2546.84E-06
+RandomExpectimaxAgent,3,capsuleClassic,-361.43,8780.36E-06
+RandomExpectimaxAgent,4,capsuleClassic,-191.14,33648.75E-06
+
